@@ -1,22 +1,26 @@
-using Microsoft.EntityFrameworkCore;  // Certifique-se de que esta linha está presente
-using MyCrudApi.Data; // Ajuste para o seu namespace
+using MyCrudApi.Services;
+using Microsoft.EntityFrameworkCore;
+using MyCrudApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuração do controlador e do Swagger para a documentação da API
+// Configuração dos controladores e do Swagger para documentação da API
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configuração do DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=ProductsDb.db")
-           .EnableSensitiveDataLogging() // Para logs mais detalhados
-           .LogTo(Console.WriteLine, LogLevel.Information)); // Para logar as queries no console
+           .EnableSensitiveDataLogging()
+           .LogTo(Console.WriteLine, LogLevel.Information));
 
+// Registra o ProductsService como um serviço escopo (scoped)
+builder.Services.AddScoped<ProductsService>();
 
 var app = builder.Build();
 
-// Configuração do Swagger e dos Middlewares
+// Configuração do Swagger e Middlewares
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
