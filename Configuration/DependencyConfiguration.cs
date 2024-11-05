@@ -1,4 +1,6 @@
-﻿using MyCrudApi.Services;
+﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+using MyCrudApi.Services;
 
 namespace MyCrudApi.Configuration
 {
@@ -6,7 +8,9 @@ namespace MyCrudApi.Configuration
     {
         public static void ConfigureInfrastructureDependencies(this IServiceCollection services)
         {
-            services.AddScoped<ProductsService>();
+            services.AddScoped<IProductService, ProductsService>();
+
+            services.AddAutoMapper(typeof(DependencyConfiguration).Assembly);
         }
     }
 }

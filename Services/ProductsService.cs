@@ -1,18 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MyCrudApi.Data;
 using MyCrudApi.Models;
+using MyCrudApi.Request;
 
 namespace MyCrudApi.Services
 {
-    public class ProductsService
+    public class ProductsService: IProductService
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ProductsService(AppDbContext context)
+        public ProductsService(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Product>> GetProducts()
@@ -25,17 +29,23 @@ namespace MyCrudApi.Services
             return await _context.Products.FindAsync(id);
         }
 
-        public async Task AddProduct(Product product)
+        public async Task AddProduct(BaseRequest product)
         {
-            product.Id = 0; // Garante que o Id não está sendo atribuído manualmente
+            var produto = _mapper.Map<Product>(product);
+            produto.Id = 0; 
 
-            _context.Products.Add(product);
+            _context.Products.Add(produto);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateProduct(Product product)
+        public async Task UpdateProduct(int id, BaseRequest productRequest)
         {
-            _context.Products.Update(product);
+            var existingProduct = await GetProduct(id);
+            if (existingProduct == null)
+            {
+                throw new KeyNotFoundException("Product not found");
+            }
+            _mapper.Map(productRequest, existingProduct);
             await _context.SaveChangesAsync();
         }
 

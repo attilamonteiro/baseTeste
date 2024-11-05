@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MyCrudApi.Models;
+using MyCrudApi.Request;
 using MyCrudApi.Services;
 
 namespace MyCrudApi.Controllers
@@ -36,14 +37,14 @@ namespace MyCrudApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct([FromBody] Product product)
+        public async Task<IActionResult> CreateProduct([FromBody] BaseRequest product)
         {
             await _productsService.AddProduct(product);
             return StatusCode(201, product); 
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product product)
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] BaseRequest product)
         {
             var existingProduct = await _productsService.GetProduct(id);
             if (existingProduct == null)
@@ -51,10 +52,10 @@ namespace MyCrudApi.Controllers
                 return NotFound();
             }
 
-            product.Id = id;
-            await _productsService.UpdateProduct(product);
+            await _productsService.UpdateProduct(id, product);
             return NoContent();
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)

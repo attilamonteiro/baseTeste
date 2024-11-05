@@ -4,18 +4,17 @@ using System.Text.Json.Serialization;
 
 namespace MyCrudApi.Models
 {
-    public class Product
+    public class Product: BaseModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Configura o Id para ser gerado automaticamente
-        [JsonIgnore] // Oculta o campo `Id` na serialização
-
-        public int Id { get; set; }
-
-        [Required]
         public string Name { get; set; }
+        public decimal Price { get; private set; }
 
-        [Required]
-        public decimal Price { get; set; }
+        public Product() { }
+        public Product(int id, string nome, decimal price)
+        {
+            Id = id;
+            Name = nome;
+            Price = price;
+        }
     }
 }
