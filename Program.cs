@@ -1,13 +1,24 @@
 using MyCrudApi.Domain.Configuration;
+using MyCrudApi.Infrastructure.Configuration;
+using Microsoft.EntityFrameworkCore;
+using MyCrudApi.Infrastructure.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Registra o DbContext
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .EnableSensitiveDataLogging()
+           .LogTo(Console.WriteLine, LogLevel.Information));
+
+// Configura as dependências do repositório e do serviço
 builder.Services.ConfigureInfrastructureDependencies();
 builder.Services.ConfigureDomainDependencies();
 
-builder.Services.AddConnections(builder.Configuration);
+// Adiciona conexões e outras dependências
+builder.Services.AddConnections();
 
-// Adicionando controladores e outras dependências
+// Adiciona controladores e outras dependências
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
