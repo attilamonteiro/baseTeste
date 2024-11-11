@@ -3,56 +3,47 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MyCrudApi.Data;
+using MyCrudApi.Interfaces.Repositories;
 using MyCrudApi.Models;
+using MyCrudApi.Repositories;
 using MyCrudApi.Request;
 
 namespace MyCrudApi.Services
 {
     public class ProductsService: IProductService
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
+        public IProductRepository _productRepository { get; set; }
 
-        public ProductsService(AppDbContext context, IMapper mapper)
+        public ProductsService(IProductRepository productRepository)
         {
-            _context = context;
-            _mapper = mapper;
+            _productRepository = productRepository;
         }
 
         public async Task<IEnumerable<Product>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            return await _productRepository.GetProducts();
         }
 
         public async Task<Product> GetProduct(int id)
         {
-            return await _context.Products.FindAsync(id);
+            return await _productRepository.GetProduct(id);
         }
 
         public async Task AddProduct(BaseRequest product)
         {
-            var produto = _mapper.Map<Product>(product);
-            produto.Id = 0; 
-
-            _context.Products.Add(produto);
-            await _context.SaveChangesAsync();
+            await _productRepository.AddProduct(product);
         }
+
 
         public async Task UpdateProduct(int id, BaseRequest productRequest)
         {
-            var existingProduct = await GetProduct(id);
-            if (existingProduct == null)
-            {
-                throw new KeyNotFoundException("Product not found");
-            }
-            _mapper.Map(productRequest, existingProduct);
-            await _context.SaveChangesAsync();
+            await _productRepository.UpdateProduct(id, productRequest);
         }
 
         public async Task DeleteProduct(Product product)
         {
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+
+            await _productRepository.DeleteProduct(product);
         }
     }
 }

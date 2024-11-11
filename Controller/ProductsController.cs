@@ -11,24 +11,24 @@ namespace MyCrudApi.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly ProductsService _productsService;
+        private readonly IProductService _productService;
 
-        public ProductsController(ProductsService productsService)
+        public ProductsController(IProductService productService)
         {
-            _productsService = productsService;
+            _productService = productService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            var products = await _productsService.GetProducts();
+            var products = await _productService.GetProducts();
             return Ok(products);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _productsService.GetProduct(id);
+            var product = await _productService.GetProduct(id);
             if (product == null)
             {
                 return NotFound();
@@ -39,20 +39,20 @@ namespace MyCrudApi.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] BaseRequest product)
         {
-            await _productsService.AddProduct(product);
+            await _productService.AddProduct(product);
             return StatusCode(201, product); 
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] BaseRequest product)
         {
-            var existingProduct = await _productsService.GetProduct(id);
+            var existingProduct = await _productService.GetProduct(id);
             if (existingProduct == null)
             {
                 return NotFound();
             }
 
-            await _productsService.UpdateProduct(id, product);
+            await _productService.UpdateProduct(id, product);
             return NoContent();
         }
 
@@ -60,13 +60,13 @@ namespace MyCrudApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _productsService.GetProduct(id);
+            var product = await _productService.GetProduct(id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            await _productsService.DeleteProduct(product);
+            await _productService.DeleteProduct(product);
             return NoContent();
         }
     }
